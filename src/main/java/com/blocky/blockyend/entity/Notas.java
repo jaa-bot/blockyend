@@ -1,5 +1,7 @@
 package com.blocky.blockyend.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,18 +12,19 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.blocky.blockyend.security.entity.Usuario;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "notas")
-public class Notas {
+public class Notas implements Serializable{
     
     private int id;
-    private Usuario usuario;
+    private Usuario usuarioid;
     private String titulo;
     private String texto;
 
-    public Notas(Usuario usuario, String titulo, String texto) {
-        this.usuario = usuario;
+    public Notas(Usuario usuarioid, String titulo, String texto) {
+        this.usuarioid = usuarioid;
         this.titulo = titulo;
         this.texto = texto;
     }
@@ -38,13 +41,14 @@ public class Notas {
         this.id = id;
     }
 
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "usuario_id")
-    public Usuario getUsuario() {
-        return usuario;
+    @JoinColumn(name = "usuarioid")
+    public Usuario getUsuarioid() {
+        return usuarioid;
     }
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setUsuarioid(Usuario usuarioid) {
+        this.usuarioid = usuarioid;
     }
     public String getTitulo() {
         return titulo;
@@ -57,7 +61,5 @@ public class Notas {
     }
     public void setTexto(String texto) {
         this.texto = texto;
-    }
-
-    
+    } 
 }

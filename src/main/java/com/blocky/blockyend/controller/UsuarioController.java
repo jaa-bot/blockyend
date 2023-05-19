@@ -28,36 +28,36 @@ import com.blocky.blockyend.service.UsuarioService;
 public class UsuarioController {
 
     @Autowired
-    UsuarioService productoService;
+    UsuarioService usuarioService;
 
     @GetMapping("/lista")
     public ResponseEntity<List<Usuario>> list(){
-        List<Usuario> list = productoService.list();
+        List<Usuario> list = usuarioService.list();
         return new ResponseEntity(list, HttpStatus.OK);
     }
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<Usuario> getById(@PathVariable("id") int id){
-        if(!productoService.existsById(id))
+        if(!usuarioService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
-            Usuario producto = productoService.getOne(id).get();
+            Usuario producto = usuarioService.getOne(id).get();
         return new ResponseEntity(producto, HttpStatus.OK);
     }
 
     @GetMapping("/detailnameUser/{nombreUsuario}")
     public ResponseEntity<Usuario> getByNombreUser(@PathVariable("nombreUsuario") String nombreUsuario){
-        if(!productoService.existsByNombreUsuario(nombreUsuario))
+        if(!usuarioService.existsByNombreUsuario(nombreUsuario))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
-            Usuario producto = productoService.getByNombreUsuario(nombreUsuario).get();
+            Usuario producto = usuarioService.getByNombreUsuario(nombreUsuario).get();
             
         return new ResponseEntity(producto, HttpStatus.OK);
     }
 
     @GetMapping("/detailname/{nombre}")
     public ResponseEntity<Usuario> getByNombre(@PathVariable("nombre") String nombre){
-        if(!productoService.existsByNombre(nombre))
+        if(!usuarioService.existsByNombre(nombre))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
-            Usuario producto = productoService.getByNombre(nombre).get();
+            Usuario producto = usuarioService.getByNombre(nombre).get();
 
         return new ResponseEntity(producto, HttpStatus.OK);
     }
@@ -67,38 +67,38 @@ public class UsuarioController {
     public ResponseEntity<?> create(@RequestBody UsuarioDto productoDto){
         if(StringUtils.isBlank(productoDto.getNombre()))
             return new ResponseEntity(new Mensaje("el nombre es obligatorio"), HttpStatus.BAD_REQUEST);
-        if(productoService.existsByNombre(productoDto.getNombre()))
+        if(usuarioService.existsByNombre(productoDto.getNombre()))
             return new ResponseEntity(new Mensaje("ese nombre ya existe"), HttpStatus.BAD_REQUEST);
-            Usuario producto = new Usuario(productoDto.getNombre(), productoDto.getNombreUsuario(), productoDto.getEmail(), productoDto.getContra(), productoDto.getNotas());
-        productoService.save(producto);
+            Usuario producto = new Usuario(productoDto.getNombre(), productoDto.getNombreUsuario(), productoDto.getEmail(), productoDto.getContra());
+            usuarioService.save(producto);
         return new ResponseEntity(new Mensaje("producto creado"), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable("id")int id, @RequestBody UsuarioDto productoDto){
-        if(!productoService.existsById(id))
+        if(!usuarioService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
-        if(productoService.existsByNombre(productoDto.getNombre()) && productoService.getByNombre(productoDto.getNombre()).get().getId() != id)
+        if(usuarioService.existsByNombre(productoDto.getNombre()) && usuarioService.getByNombre(productoDto.getNombre()).get().getId() != id)
             return new ResponseEntity(new Mensaje("ese nombre ya existe"), HttpStatus.BAD_REQUEST);
         if(StringUtils.isBlank(productoDto.getNombre()))
             return new ResponseEntity(new Mensaje("el nombre es obligatorio"), HttpStatus.BAD_REQUEST);
 
-            Usuario producto = productoService.getOne(id).get();
+            Usuario producto = usuarioService.getOne(id).get();
         producto.setNombre(productoDto.getNombre());
         producto.setEmail(productoDto.getEmail());
         producto.setPassword(productoDto.getContra());
         producto.setNombreUsuario(productoDto.getNombreUsuario());
-        productoService.save(producto);
+        usuarioService.save(producto);
         return new ResponseEntity(new Mensaje("producto actualizado"), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id")int id){
-        if(!productoService.existsById(id))
+        if(!usuarioService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
-        productoService.delete(id);
+            usuarioService.delete(id);
         return new ResponseEntity(new Mensaje("producto eliminado"), HttpStatus.OK);
     }
 }

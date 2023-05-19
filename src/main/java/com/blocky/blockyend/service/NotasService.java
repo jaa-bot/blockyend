@@ -25,7 +25,7 @@ public class NotasService {
     }
 
     public Optional<Notas> getAll(int id){
-        return notasRepository.findByUserid(id);
+        return notasRepository.findByUsuarioid(id);
     }
 
     public void save(Notas producto){

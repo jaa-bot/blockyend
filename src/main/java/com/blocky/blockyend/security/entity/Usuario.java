@@ -1,16 +1,29 @@
 package com.blocky.blockyend.security.entity;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-
-import com.blocky.blockyend.entity.Notas;
-
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import com.blocky.blockyend.entity.Notas;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "usuario")
-public class Usuario {
+public class Usuario implements Serializable{
 
     private int id;
     @NotNull
@@ -21,11 +34,8 @@ public class Usuario {
     private String email;
     @NotNull
     private String password;
-    
+
     @NotNull
-    @ElementCollection(fetch = FetchType.EAGER)
-    @JoinTable(name = "usuario_rol", joinColumns = @JoinColumn(name = "usuario_id"),
-    inverseJoinColumns = @JoinColumn(name = "rol_id"))
     private Set<Rol> roles = new HashSet<>();
 
     private Set<Notas> notas;
@@ -34,14 +44,12 @@ public class Usuario {
     }
 
     public Usuario(@NotNull String nombre, @NotNull String nombreUsuario, @NotNull String email,
-            @NotNull String password, Set<Notas> notas) {
+            @NotNull String password) {
         this.nombre = nombre;
         this.nombreUsuario = nombreUsuario;
         this.email = email;
         this.password = password;
-        this.notas = notas;
     }
-
 
     @Id
     @Column(name = "id")
@@ -86,6 +94,9 @@ public class Usuario {
         this.password = password;
     }
 
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "usuario_rol", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "rol_id"))
     public Set<Rol> getRoles() {
         return roles;
     }
@@ -94,7 +105,8 @@ public class Usuario {
         this.roles = roles;
     }
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "usuarioid", cascade = CascadeType.ALL)
     public Set<Notas> getNotas() {
         return notas;
     }

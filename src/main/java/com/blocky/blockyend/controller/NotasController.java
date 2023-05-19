@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.blocky.blockyend.dto.Mensaje;
 import com.blocky.blockyend.dto.NotasDto;
 import com.blocky.blockyend.entity.Notas;
+import com.blocky.blockyend.security.entity.Usuario;
 import com.blocky.blockyend.service.NotasService;
+import com.blocky.blockyend.service.UsuarioService;
 
 @RestController
 @RequestMapping("/notas")
@@ -29,6 +31,9 @@ public class NotasController {
 
     @Autowired
     NotasService notasService;
+
+    @Autowired
+    UsuarioService usuarioService;
 
     @GetMapping("/listaNotas")
     public ResponseEntity<List<Notas>> list() {
@@ -45,12 +50,21 @@ public class NotasController {
     }
 
     @PostMapping("/nuevoNotas")
-    public ResponseEntity<?> create(@RequestBody NotasDto productoDto) {
-        if (StringUtils.isBlank(productoDto.getTitulo()))
-            return new ResponseEntity(new Mensaje("el titulo es obligatorio"), HttpStatus.BAD_REQUEST);
-        Notas producto = new Notas(productoDto.getUserId(), productoDto.getTitulo(), productoDto.getTexto());
-        notasService.save(producto);
-        return new ResponseEntity(new Mensaje("producto creado"), HttpStatus.OK);
+    public ResponseEntity<?> create(@RequestBody NotasDto notasDto) {
+        if (StringUtils.isBlank(notasDto.getTitulo())) {
+            return new ResponseEntity(new Mensaje("El título es obligatorio"), HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<Usuario> optionalUsuario = usuarioService.getOne(notasDto.getUserId());
+
+        if (optionalUsuario.isPresent()) {
+            Usuario usuario = optionalUsuario.get();
+            Notas notas = new Notas(usuario, notasDto.getTitulo(), notasDto.getTexto());
+            notasService.save(notas);
+            return new ResponseEntity(new Mensaje("Nota creada"), HttpStatus.OK);
+        } else {
+            return new ResponseEntity(new Mensaje("Usuario no encontrado"), HttpStatus.NOT_FOUND);
+        }
     }
 
     @PutMapping("/updateNotas/{id}")
@@ -58,12 +72,20 @@ public class NotasController {
         if (!notasService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
 
-        Notas nota = notasService.getOne(id).get();
-        nota.setUsuario(notasDto.getUserId());
-        nota.setTitulo(notasDto.getTitulo());
-        nota.setTexto(notasDto.getTexto());
-        notasService.save(nota);
-        return new ResponseEntity(new Mensaje("nota actualizada"), HttpStatus.OK);
+        System.out.println("miau  " + notasDto.getUserId());
+        Optional<Usuario> optionalUsuario = usuarioService.getOne(notasDto.getUserId());
+
+        if (optionalUsuario.isPresent()) {
+            Usuario usuario = optionalUsuario.get();
+            Notas nota = notasService.getOne(id).get();
+            nota.setUsuarioid(usuario);
+            nota.setTitulo(notasDto.getTitulo());
+            nota.setTexto(notasDto.getTexto());
+            notasService.save(nota);
+            return new ResponseEntity(new Mensaje("nota actualizada"), HttpStatus.OK);
+        } else{
+            return new ResponseEntity(new Mensaje("Usuario no encontrado"), HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/deleteNotas/{id}")
@@ -75,8 +97,8 @@ public class NotasController {
     }
 
     @GetMapping("/detailnameNotas/{userId}")
-    public ResponseEntity<List<Notas>> getByNombre(@PathVariable("userId") int id){
-            Optional<Notas> nota = notasService.getAll(id);
+    public ResponseEntity<List<Notas>> getByNombre(@PathVariable("userId") int id) {
+        Optional<Notas> nota = notasService.getAll(id);
         return new ResponseEntity(nota, HttpStatus.OK);
     }
 }

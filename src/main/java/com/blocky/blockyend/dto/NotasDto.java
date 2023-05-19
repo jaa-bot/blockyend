@@ -2,26 +2,24 @@ package com.blocky.blockyend.dto;
 
 import javax.validation.constraints.NotBlank;
 
-import com.blocky.blockyend.security.entity.Usuario;
-
 public class NotasDto {
     @NotBlank
-    private Usuario userId;
+    private int userId;
     @NotBlank
     private String titulo;
     @NotBlank
     private String texto;
 
-    public NotasDto(Usuario userId, String titulo, String texto) {
+    public NotasDto(int userId, String titulo, String texto) {
         this.userId = userId;
         this.titulo = titulo;
         this.texto = texto;
     }
 
-    public Usuario getUserId() {
+    public int getUserId() {
         return userId;
     }
-    public void setUserId(Usuario userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
     public String getTitulo() {

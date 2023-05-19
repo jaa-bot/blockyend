@@ -3,10 +3,17 @@ package com.blocky.blockyend.security.entity;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotNull;
 
 import com.blocky.blockyend.security.enums.RolNombre;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Rol {
@@ -17,6 +24,7 @@ public class Rol {
     @Enumerated(EnumType.STRING)
     private RolNombre rolNombre;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private Set<Usuario> usuarios = new HashSet<>();
 

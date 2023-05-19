@@ -8,5 +8,5 @@ import com.blocky.blockyend.entity.Notas;
 
 
 public interface NotasRepository extends JpaRepository<Notas, Integer> {
-    Optional<Notas> findByUserid(Integer userid);
+    Optional<Notas> findByUsuarioid(Integer usuarioid);
 }

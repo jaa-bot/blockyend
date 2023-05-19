@@ -1,6 +1,5 @@
 package com.blocky.blockyend.dto;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.validation.constraints.NotBlank;
