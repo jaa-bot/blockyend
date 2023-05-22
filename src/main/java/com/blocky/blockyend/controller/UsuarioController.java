@@ -84,7 +84,7 @@ public class UsuarioController {
         if(StringUtils.isBlank(productoDto.getNombre()))
             return new ResponseEntity(new Mensaje("el nombre es obligatorio"), HttpStatus.BAD_REQUEST);
 
-            Usuario producto = usuarioService.getOne(id).get();
+        Usuario producto = usuarioService.getOne(id).get();
         producto.setNombre(productoDto.getNombre());
         producto.setEmail(productoDto.getEmail());
         producto.setPassword(productoDto.getContra());
