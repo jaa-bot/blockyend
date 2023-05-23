@@ -74,24 +74,33 @@ public class UsuarioController {
         return new ResponseEntity(new Mensaje("producto creado"), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> update(@PathVariable("id")int id, @RequestBody UsuarioDto productoDto){
-        if(!usuarioService.existsById(id))
+    public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody UsuarioDto usuarioDto) {
+        if (!usuarioService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
-        if(usuarioService.existsByNombre(productoDto.getNombre()) && usuarioService.getByNombre(productoDto.getNombre()).get().getId() != id)
+    
+        if (usuarioService.existsByNombre(usuarioDto.getNombre())
+                && usuarioService.getByNombre(usuarioDto.getNombre()).get().getId() != id)
             return new ResponseEntity(new Mensaje("ese nombre ya existe"), HttpStatus.BAD_REQUEST);
-        if(StringUtils.isBlank(productoDto.getNombre()))
+    
+        if (StringUtils.isBlank(usuarioDto.getNombre()))
             return new ResponseEntity(new Mensaje("el nombre es obligatorio"), HttpStatus.BAD_REQUEST);
-
-        Usuario producto = usuarioService.getOne(id).get();
-        producto.setNombre(productoDto.getNombre());
-        producto.setEmail(productoDto.getEmail());
-        producto.setPassword(productoDto.getContra());
-        producto.setNombreUsuario(productoDto.getNombreUsuario());
-        usuarioService.save(producto);
+    
+        Usuario usuario = usuarioService.getOne(id).orElse(null);
+        if (usuario == null)
+            return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
+    
+        usuario.setNombre(usuarioDto.getNombre());
+        usuario.setEmail(usuarioDto.getEmail());
+        usuario.setNombreUsuario(usuarioDto.getNombreUsuario());
+    
+        if (!StringUtils.isBlank(usuarioDto.getContra()))
+            usuario.setPassword(usuarioDto.getContra());
+    
+        usuarioService.save(usuario);
         return new ResponseEntity(new Mensaje("producto actualizado"), HttpStatus.OK);
     }
+    
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
