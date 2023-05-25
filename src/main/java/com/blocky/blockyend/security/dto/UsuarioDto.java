@@ -3,18 +3,19 @@ package com.blocky.blockyend.security.dto;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 import com.blocky.blockyend.entity.Notas;
 
-public class NuevoUsuario {
+public class UsuarioDto {
     @NotBlank
     private String nombre;
     @NotBlank
     private String nombreUsuario;
-    @Email
+
+    @NotBlank
     private String email;
+
     @NotBlank
     private String password;
     private Set<String> roles = new HashSet<>();

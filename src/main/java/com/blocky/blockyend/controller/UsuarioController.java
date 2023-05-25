@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.blocky.blockyend.dto.Mensaje;
-import com.blocky.blockyend.dto.UsuarioDto;
+import com.blocky.blockyend.security.dto.UsuarioDto;
 import com.blocky.blockyend.security.entity.Usuario;
 import com.blocky.blockyend.service.UsuarioService;
 
@@ -29,6 +30,9 @@ public class UsuarioController {
 
     @Autowired
     UsuarioService usuarioService;
+    
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @GetMapping("/lista")
     public ResponseEntity<List<Usuario>> list(){
@@ -62,18 +66,6 @@ public class UsuarioController {
         return new ResponseEntity(producto, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create")
-    public ResponseEntity<?> create(@RequestBody UsuarioDto productoDto){
-        if(StringUtils.isBlank(productoDto.getNombre()))
-            return new ResponseEntity(new Mensaje("el nombre es obligatorio"), HttpStatus.BAD_REQUEST);
-        if(usuarioService.existsByNombre(productoDto.getNombre()))
-            return new ResponseEntity(new Mensaje("ese nombre ya existe"), HttpStatus.BAD_REQUEST);
-            Usuario producto = new Usuario(productoDto.getNombre(), productoDto.getNombreUsuario(), productoDto.getEmail(), productoDto.getContra());
-            usuarioService.save(producto);
-        return new ResponseEntity(new Mensaje("producto creado"), HttpStatus.OK);
-    }
-
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody UsuarioDto usuarioDto) {
         if (!usuarioService.existsById(id))
@@ -93,9 +85,11 @@ public class UsuarioController {
         usuario.setNombre(usuarioDto.getNombre());
         usuario.setEmail(usuarioDto.getEmail());
         usuario.setNombreUsuario(usuarioDto.getNombreUsuario());
+        System.out.println("AAAAAAAAAA   " + usuarioDto.getPassword());
     
-        if (!StringUtils.isBlank(usuarioDto.getContra()))
-            usuario.setPassword(usuarioDto.getContra());
+        if (!StringUtils.isBlank(usuarioDto.getPassword()))
+            usuario.setPassword(passwordEncoder.encode(usuarioDto.getPassword()));
+
     
         usuarioService.save(usuario);
         return new ResponseEntity(new Mensaje("producto actualizado"), HttpStatus.OK);
