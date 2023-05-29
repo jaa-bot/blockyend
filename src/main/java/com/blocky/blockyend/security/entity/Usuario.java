@@ -20,6 +20,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import com.blocky.blockyend.entity.Log;
 import com.blocky.blockyend.entity.Notas;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -45,6 +46,8 @@ public class Usuario implements Serializable {
     private Set<Rol> roles = new HashSet<>();
 
     private Set<Notas> notas;
+
+    private Set<Log> log;
 
     public Usuario() {
     }
@@ -119,5 +122,16 @@ public class Usuario implements Serializable {
 
     public void setNotas(Set<Notas> notas) {
         this.notas = notas;
+    }
+
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "usuarioid", cascade = CascadeType.ALL)
+    public Set<Log> getLog() {
+        return log;
+    }
+
+    public void setLog(Set<Log> log) {
+        this.log = log;
     }
 }

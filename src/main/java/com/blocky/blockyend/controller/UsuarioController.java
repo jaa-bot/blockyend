@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.blocky.blockyend.dto.LogDto;
 import com.blocky.blockyend.dto.Mensaje;
 import com.blocky.blockyend.security.dto.UsuarioDto;
 import com.blocky.blockyend.security.entity.Usuario;
@@ -30,6 +31,9 @@ public class UsuarioController {
 
     @Autowired
     UsuarioService usuarioService;
+
+    @Autowired
+    LogController logController;
     
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -85,14 +89,21 @@ public class UsuarioController {
         usuario.setNombre(usuarioDto.getNombre());
         usuario.setEmail(usuarioDto.getEmail());
         usuario.setNombreUsuario(usuarioDto.getNombreUsuario());
-        System.out.println("AAAAAAAAAA   " + usuarioDto.getPassword());
     
         if (!StringUtils.isBlank(usuarioDto.getPassword()))
             usuario.setPassword(passwordEncoder.encode(usuarioDto.getPassword()));
 
     
         usuarioService.save(usuario);
-        return new ResponseEntity(new Mensaje("producto actualizado"), HttpStatus.OK);
+        if(usuario.getRoles().contains("ADMIN")){
+            logController.create(new LogDto(usuario.getId(), "El admin ha actualizado el usuario: " + usuario.getNombreUsuario()));
+        }
+        else{
+            logController.create(new LogDto(usuario.getId(), "El usuario: " + usuario.getNombreUsuario() + " ha actualizado su perfil"));
+        }
+        
+
+        return new ResponseEntity(new Mensaje("Se ha actualizado su perfil"), HttpStatus.OK);
     }
     
 
@@ -102,6 +113,6 @@ public class UsuarioController {
         if(!usuarioService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
             usuarioService.delete(id);
-        return new ResponseEntity(new Mensaje("producto eliminado"), HttpStatus.OK);
+        return new ResponseEntity(new Mensaje("has eliminado el usuario con id: " + id), HttpStatus.OK);
     }
 }

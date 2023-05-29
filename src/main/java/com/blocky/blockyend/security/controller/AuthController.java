@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.blocky.blockyend.controller.LogController;
+import com.blocky.blockyend.dto.LogDto;
 import com.blocky.blockyend.dto.Mensaje;
 import com.blocky.blockyend.security.dto.JwtDto;
 import com.blocky.blockyend.security.dto.LoginUsuario;
@@ -52,6 +54,9 @@ public class AuthController {
     @Autowired
     JwtProvider jwtProvider;
 
+    @Autowired
+    LogController logController;
+
     @PostMapping("/nuevo")
     public ResponseEntity<?> nuevo(@Valid @RequestBody UsuarioDto nuevoUsuario, BindingResult bindingResult) {
 
@@ -61,7 +66,7 @@ public class AuthController {
             return new ResponseEntity(new Mensaje("Formato email mal introducido"), HttpStatus.BAD_REQUEST);
         }
         if (usuarioService.existsByNombreUsuario(nuevoUsuario.getNombreUsuario()))
-            return new ResponseEntity(new Mensaje("El nombre de usuario ya existe aaaa"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(new Mensaje("El nombre de usuario ya existe"), HttpStatus.BAD_REQUEST);
         if (usuarioService.existsByEmail(nuevoUsuario.getEmail()))
             return new ResponseEntity(new Mensaje("Ya hay una cuenta registrada con ese email"),
                     HttpStatus.BAD_REQUEST);
@@ -74,6 +79,9 @@ public class AuthController {
             roles.add(rolService.getByRolNombre(RolNombre.ROLE_ADMIN).get());
         usuario.setRoles(roles);
         usuarioService.save(usuario);
+
+        logController.create(new LogDto(usuario.getId(), "Nuevo usuario registrado. Nombre Usuario: " + usuario.getNombreUsuario()));
+
         return new ResponseEntity(new Mensaje("usuario guardado"), HttpStatus.CREATED);
     }
 
