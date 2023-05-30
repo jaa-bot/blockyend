@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.blocky.blockyend.dto.LogDto;
 import com.blocky.blockyend.dto.Mensaje;
 import com.blocky.blockyend.dto.NotasDto;
 import com.blocky.blockyend.entity.Notas;
@@ -34,6 +35,9 @@ public class NotasController {
 
     @Autowired
     UsuarioService usuarioService;
+
+    @Autowired
+    LogController logController;
 
     @GetMapping("/listaNotas")
     public ResponseEntity<List<Notas>> list() {
@@ -75,6 +79,11 @@ public class NotasController {
             Usuario usuario = optionalUsuario.get();
             Notas notas = new Notas(usuario, notasDto.getTitulo(), notasDto.getTexto());
             notasService.save(notas);
+
+            logController.create(
+                    new LogDto(usuario.getId(), "El usuario: " + usuario.getNombreUsuario()
+                            + " ha creado una nueva nota. Titulo de la nota: " + notas.getTitulo()));
+
             return new ResponseEntity(new Mensaje("Nota creada"), HttpStatus.OK);
         } else {
             return new ResponseEntity(new Mensaje("Usuario no encontrado"), HttpStatus.NOT_FOUND);
@@ -83,11 +92,22 @@ public class NotasController {
 
     @PutMapping("/updateNotas/{id}")
     public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody NotasDto notasDto) {
-        
+
         Notas nota = notasService.getOne(id).get();
         nota.setTitulo(notasDto.getTitulo());
         nota.setTexto(notasDto.getTexto());
         notasService.save(nota);
+
+        Optional<Usuario> optionalUsuario = usuarioService.getOne(notasDto.getUserId());
+
+        if (optionalUsuario.isPresent()) {
+            Usuario usuario = optionalUsuario.get();
+
+            logController.create(
+                    new LogDto(usuario.getId(), "El usuario: " + usuario.getNombreUsuario()
+                            + " ha actualizado la nota con titulo: " + nota.getTitulo()));
+        }
+
         return new ResponseEntity(new Mensaje("nota actualizada"), HttpStatus.OK);
     }
 
@@ -95,6 +115,18 @@ public class NotasController {
     public ResponseEntity<?> delete(@PathVariable("id") int id) {
         if (!notasService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
+
+        Optional<Usuario> optionalUsuario = usuarioService.getOne(id);
+
+        if (optionalUsuario.isPresent()) {
+            Usuario usuario = optionalUsuario.get();
+            Notas nota = notasService.getOne(id).get();
+
+            logController.create(
+                    new LogDto(usuario.getId(), "El usuario: " + usuario.getNombreUsuario()
+                            + " ha borrado la nota con titulo: " + nota.getTitulo()));
+        }
+
         notasService.delete(id);
         return new ResponseEntity(new Mensaje("nota eliminada"), HttpStatus.OK);
     }

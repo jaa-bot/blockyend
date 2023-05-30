@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,38 +33,38 @@ public class UsuarioController {
 
     @Autowired
     LogController logController;
-    
+
     @Autowired
     PasswordEncoder passwordEncoder;
 
     @GetMapping("/lista")
-    public ResponseEntity<List<Usuario>> list(){
+    public ResponseEntity<List<Usuario>> list() {
         List<Usuario> list = usuarioService.list();
         return new ResponseEntity(list, HttpStatus.OK);
     }
 
     @GetMapping("/detail/{id}")
-    public ResponseEntity<Usuario> getById(@PathVariable("id") int id){
-        if(!usuarioService.existsById(id))
+    public ResponseEntity<Usuario> getById(@PathVariable("id") int id) {
+        if (!usuarioService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
-            Usuario producto = usuarioService.getOne(id).get();
+        Usuario producto = usuarioService.getOne(id).get();
         return new ResponseEntity(producto, HttpStatus.OK);
     }
 
     @GetMapping("/detailnameUser/{nombreUsuario}")
-    public ResponseEntity<Usuario> getByNombreUser(@PathVariable("nombreUsuario") String nombreUsuario){
-        if(!usuarioService.existsByNombreUsuario(nombreUsuario))
+    public ResponseEntity<Usuario> getByNombreUser(@PathVariable("nombreUsuario") String nombreUsuario) {
+        if (!usuarioService.existsByNombreUsuario(nombreUsuario))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
-            Usuario producto = usuarioService.getByNombreUsuario(nombreUsuario).get();
-            
+        Usuario producto = usuarioService.getByNombreUsuario(nombreUsuario).get();
+
         return new ResponseEntity(producto, HttpStatus.OK);
     }
 
     @GetMapping("/detailname/{nombre}")
-    public ResponseEntity<Usuario> getByNombre(@PathVariable("nombre") String nombre){
-        if(!usuarioService.existsByNombre(nombre))
+    public ResponseEntity<Usuario> getByNombre(@PathVariable("nombre") String nombre) {
+        if (!usuarioService.existsByNombre(nombre))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
-            Usuario producto = usuarioService.getByNombre(nombre).get();
+        Usuario producto = usuarioService.getByNombre(nombre).get();
 
         return new ResponseEntity(producto, HttpStatus.OK);
     }
@@ -74,45 +73,77 @@ public class UsuarioController {
     public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody UsuarioDto usuarioDto) {
         if (!usuarioService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
-    
-        if (usuarioService.existsByNombre(usuarioDto.getNombre())
-                && usuarioService.getByNombre(usuarioDto.getNombre()).get().getId() != id)
-            return new ResponseEntity(new Mensaje("ese nombre ya existe"), HttpStatus.BAD_REQUEST);
-    
+
+        if (!usuarioService.existsByNombreUsuario(usuarioDto.getNombreUsuario()))
+            return new ResponseEntity(new Mensaje("El nombre de usuario ya existe"), HttpStatus.BAD_REQUEST);
+
         if (StringUtils.isBlank(usuarioDto.getNombre()))
             return new ResponseEntity(new Mensaje("el nombre es obligatorio"), HttpStatus.BAD_REQUEST);
-    
+
         Usuario usuario = usuarioService.getOne(id).orElse(null);
         if (usuario == null)
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
-    
+
         usuario.setNombre(usuarioDto.getNombre());
         usuario.setEmail(usuarioDto.getEmail());
         usuario.setNombreUsuario(usuarioDto.getNombreUsuario());
-    
+
         if (!StringUtils.isBlank(usuarioDto.getPassword()))
             usuario.setPassword(passwordEncoder.encode(usuarioDto.getPassword()));
 
-    
         usuarioService.save(usuario);
-        if(usuario.getRoles().contains("ADMIN")){
-            logController.create(new LogDto(usuario.getId(), "El admin ha actualizado el usuario: " + usuario.getNombreUsuario()));
-        }
-        else{
-            logController.create(new LogDto(usuario.getId(), "El usuario: " + usuario.getNombreUsuario() + " ha actualizado su perfil"));
-        }
-        
 
-        return new ResponseEntity(new Mensaje("Se ha actualizado su perfil"), HttpStatus.OK);
+        logController.create(
+                new LogDto(usuario.getId(), "El usuario: " + usuario.getNombreUsuario() + " ha actualizado su perfil"));
+
+        return new ResponseEntity(new Mensaje("Se ha actualizado el perfil"), HttpStatus.OK);
     }
-    
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/updateAdmin/{id}")
+    public ResponseEntity<?> updateAdmin(@PathVariable("id") int id, @RequestBody UsuarioDto usuarioDto) {
+        if (!usuarioService.existsById(id))
+            return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
+
+        if (!usuarioService.existsByNombreUsuario(usuarioDto.getNombreUsuario()))
+            return new ResponseEntity(new Mensaje("El nombre de usuario ya existe"), HttpStatus.BAD_REQUEST);
+
+        if (StringUtils.isBlank(usuarioDto.getNombre()))
+            return new ResponseEntity(new Mensaje("el nombre es obligatorio"), HttpStatus.BAD_REQUEST);
+
+        Usuario usuario = usuarioService.getOne(id).orElse(null);
+        if (usuario == null)
+            return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
+
+        usuario.setNombre(usuarioDto.getNombre());
+        usuario.setEmail(usuarioDto.getEmail());
+        usuario.setNombreUsuario(usuarioDto.getNombreUsuario());
+
+        if (!StringUtils.isBlank(usuarioDto.getPassword()))
+            usuario.setPassword(passwordEncoder.encode(usuarioDto.getPassword()));
+
+        usuarioService.save(usuario);
+
+        logController.create(
+                new LogDto(usuario.getId(), "El Admin ha actualizado al usuario: " + usuario.getNombreUsuario()));
+
+        return new ResponseEntity(new Mensaje("Se ha actualizado el perfil"), HttpStatus.OK);
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id")int id){
-        if(!usuarioService.existsById(id))
+    public ResponseEntity<?> delete(@PathVariable("id") int id) {
+        if (!usuarioService.existsById(id)) {
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
-            usuarioService.delete(id);
+        }
+
+        Usuario usuario = usuarioService.getOne(id).orElse(null);
+
+        logController
+                .create(new LogDto(usuario.getId(), "El Admin ha borrado al usuario: " + usuario.getNombreUsuario()));
+
+        usuarioService.delete(id);
+
         return new ResponseEntity(new Mensaje("has eliminado el usuario con id: " + id), HttpStatus.OK);
     }
 }

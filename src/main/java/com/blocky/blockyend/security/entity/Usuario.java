@@ -16,7 +16,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -45,9 +44,9 @@ public class Usuario implements Serializable {
     @NotNull
     private Set<Rol> roles = new HashSet<>();
 
-    private Set<Notas> notas;
+    private Set<Notas> notas = new HashSet<>();
 
-    private Set<Log> log;
+    private Set<Log> log = new HashSet<>();
 
     public Usuario() {
     }
