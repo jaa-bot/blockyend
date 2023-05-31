@@ -71,16 +71,19 @@ public class UsuarioController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody UsuarioDto usuarioDto) {
+
+        Usuario usuario = usuarioService.getOne(id).orElse(null);
+
         if (!usuarioService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
 
-        if (!usuarioService.existsByNombreUsuario(usuarioDto.getNombreUsuario()))
+        if (!usuarioDto.getNombreUsuario().equals(usuario.getNombreUsuario())
+                && usuarioService.existsByNombreUsuario(usuarioDto.getNombreUsuario()))
             return new ResponseEntity(new Mensaje("El nombre de usuario ya existe"), HttpStatus.BAD_REQUEST);
 
         if (StringUtils.isBlank(usuarioDto.getNombre()))
             return new ResponseEntity(new Mensaje("el nombre es obligatorio"), HttpStatus.BAD_REQUEST);
 
-        Usuario usuario = usuarioService.getOne(id).orElse(null);
         if (usuario == null)
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
 
@@ -102,25 +105,25 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/updateAdmin/{id}")
     public ResponseEntity<?> updateAdmin(@PathVariable("id") int id, @RequestBody UsuarioDto usuarioDto) {
+
+        Usuario usuario = usuarioService.getOne(id).orElse(null);
+
         if (!usuarioService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
 
-        if (!usuarioService.existsByNombreUsuario(usuarioDto.getNombreUsuario()))
+        if (!usuarioDto.getNombreUsuario().equals(usuario.getNombreUsuario())
+                && usuarioService.existsByNombreUsuario(usuarioDto.getNombreUsuario()))
             return new ResponseEntity(new Mensaje("El nombre de usuario ya existe"), HttpStatus.BAD_REQUEST);
 
         if (StringUtils.isBlank(usuarioDto.getNombre()))
             return new ResponseEntity(new Mensaje("el nombre es obligatorio"), HttpStatus.BAD_REQUEST);
 
-        Usuario usuario = usuarioService.getOne(id).orElse(null);
         if (usuario == null)
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
 
         usuario.setNombre(usuarioDto.getNombre());
         usuario.setEmail(usuarioDto.getEmail());
         usuario.setNombreUsuario(usuarioDto.getNombreUsuario());
-
-        if (!StringUtils.isBlank(usuarioDto.getPassword()))
-            usuario.setPassword(passwordEncoder.encode(usuarioDto.getPassword()));
 
         usuarioService.save(usuario);
 

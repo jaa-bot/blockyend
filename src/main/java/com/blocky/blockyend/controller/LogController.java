@@ -48,7 +48,7 @@ public class LogController {
             Usuario usuario = optionalUsuario.get();
             Date fecha = new Date();
             
-            Log log = new Log(usuario, logDto.getAccion(), String.valueOf(new SimpleDateFormat("dd-MM-yyyy").format(fecha)));
+            Log log = new Log(usuario, logDto.getAccion(), String.valueOf(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(fecha)));
             logService.save(log);
         } else {
             System.out.println("no se pudo crear el log correctamente");
