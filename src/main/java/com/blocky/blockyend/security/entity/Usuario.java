@@ -21,6 +21,7 @@ import javax.validation.constraints.Pattern;
 
 import com.blocky.blockyend.entity.Log;
 import com.blocky.blockyend.entity.Notas;
+import com.blocky.blockyend.entity.Token;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -47,6 +48,8 @@ public class Usuario implements Serializable {
     private Set<Notas> notas = new HashSet<>();
 
     private Set<Log> log = new HashSet<>();
+
+    private Set<Token> tokens = new HashSet<>();
 
     public Usuario() {
     }
@@ -133,4 +136,16 @@ public class Usuario implements Serializable {
     public void setLog(Set<Log> log) {
         this.log = log;
     }
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "usuarioid", cascade = CascadeType.ALL)
+    public Set<Token> getToken() {
+        return tokens;
+    }
+
+    public void setToken(Set<Token> tokens) {
+        this.tokens = tokens;
+    }
+
+    
 }

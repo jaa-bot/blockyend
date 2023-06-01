@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.blocky.blockyend.dto.LogDto;
-import com.blocky.blockyend.dto.Mensaje;
 import com.blocky.blockyend.entity.Log;
 import com.blocky.blockyend.security.entity.Usuario;
 import com.blocky.blockyend.service.LogService;
@@ -36,7 +35,7 @@ public class LogController {
     @GetMapping("/listaLog")
     public ResponseEntity<List<Log>> list() {
         List<Log> list = logService.list();
-        return new ResponseEntity(list, HttpStatus.OK);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @PostMapping("/nuevoLog")
