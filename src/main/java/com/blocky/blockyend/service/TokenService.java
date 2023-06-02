@@ -32,4 +32,7 @@ public class TokenService {
         return tokenRepository.findById(id);
     }
 
+    public List<Token> findByUsuarioid(int usuarioid) {
+        return tokenRepository.findByUsuarioid(usuarioid);
+    }
 }
