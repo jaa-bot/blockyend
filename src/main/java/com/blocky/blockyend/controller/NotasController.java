@@ -42,7 +42,7 @@ public class NotasController {
     @GetMapping("/listaNotas")
     public ResponseEntity<List<Notas>> list() {
         List<Notas> list = notasService.list();
-        return new ResponseEntity(list, HttpStatus.OK);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @GetMapping("/notasPorUsuario/{usuarioid}")
@@ -54,7 +54,7 @@ public class NotasController {
             List<Notas> notas = notasService.listByUsuario(usuario);
             return ResponseEntity.ok(notas);
         } else {
-            return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
     }
@@ -62,15 +62,15 @@ public class NotasController {
     @GetMapping("/detailNotas/{id}")
     public ResponseEntity<Notas> getById(@PathVariable("id") int id) {
         if (!notasService.existsById(id))
-            return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         Notas notas = notasService.getOne(id).get();
-        return new ResponseEntity(notas, HttpStatus.OK);
+        return new ResponseEntity<>(notas, HttpStatus.OK);
     }
 
     @PostMapping("/nuevoNotas")
     public ResponseEntity<?> create(@RequestBody NotasDto notasDto) {
         if (StringUtils.isBlank(notasDto.getTitulo())) {
-            return new ResponseEntity(new Mensaje("El título es obligatorio"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Mensaje("El título es obligatorio"), HttpStatus.BAD_REQUEST);
         }
 
         Optional<Usuario> optionalUsuario = usuarioService.getOne(notasDto.getUserId());
@@ -84,9 +84,9 @@ public class NotasController {
                     new LogDto(usuario.getId(), "El usuario: " + usuario.getNombreUsuario()
                             + " ha creado una nueva nota. Titulo de la nota: " + notas.getTitulo()));
 
-            return new ResponseEntity(new Mensaje("Nota creada"), HttpStatus.OK);
+            return new ResponseEntity<>(new Mensaje("Nota creada"), HttpStatus.OK);
         } else {
-            return new ResponseEntity(new Mensaje("Usuario no encontrado"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Mensaje("Usuario no encontrado"), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -108,13 +108,13 @@ public class NotasController {
                             + " ha actualizado la nota con titulo: " + nota.getTitulo()));
         }
 
-        return new ResponseEntity(new Mensaje("nota actualizada"), HttpStatus.OK);
+        return new ResponseEntity<>(new Mensaje("nota actualizada"), HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteNotas/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") int id) {
         if (!notasService.existsById(id))
-            return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
 
         Optional<Usuario> optionalUsuario = usuarioService.getOne(id);
 
@@ -128,6 +128,6 @@ public class NotasController {
         }
 
         notasService.delete(id);
-        return new ResponseEntity(new Mensaje("nota eliminada"), HttpStatus.OK);
+        return new ResponseEntity<>(new Mensaje("nota eliminada"), HttpStatus.OK);
     }
 }

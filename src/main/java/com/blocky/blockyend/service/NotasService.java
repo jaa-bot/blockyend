@@ -11,39 +11,34 @@ import com.blocky.blockyend.entity.Notas;
 import com.blocky.blockyend.repository.NotasRepository;
 import com.blocky.blockyend.security.entity.Usuario;
 
-@Service @Transactional
-public class NotasService
-{
+@Service
+@Transactional
+public class NotasService {
 
     @Autowired
     NotasRepository notasRepository;
 
-    public List<Notas> list()
-    {
+    public List<Notas> list() {
         return notasRepository.findAll();
     }
 
-    public Optional<Notas> getOne(int id)
-    {
+    public Optional<Notas> getOne(int id) {
         return notasRepository.findById(id);
     }
 
-    public void save(Notas producto)
-    {
+    public void save(Notas producto) {
         notasRepository.save(producto);
     }
 
-    public void delete(int id)
-    {
+    public void delete(int id) {
         notasRepository.deleteById(id);
     }
 
-    public boolean existsById(int id)
-    {
+    public boolean existsById(int id) {
         return notasRepository.existsById(id);
     }
 
- public List<Notas> listByUsuario(Usuario usuario) {
-    return notasRepository.findByUsuarioid(usuario);
-}
+    public List<Notas> listByUsuario(Usuario usuario) {
+        return notasRepository.findByUsuarioid(usuario);
+    }
 }

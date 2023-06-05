@@ -19,6 +19,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import com.blocky.blockyend.entity.Contacto;
 import com.blocky.blockyend.entity.Log;
 import com.blocky.blockyend.entity.Notas;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -47,6 +48,10 @@ public class Usuario implements Serializable {
     private Set<Notas> notas = new HashSet<>();
 
     private Set<Log> log = new HashSet<>();
+
+    private Set<Contacto> contactosEnviados = new HashSet<>();
+
+    private Set<Contacto> contactosRecibidos = new HashSet<>();
 
     public Usuario() {
     }
@@ -123,7 +128,6 @@ public class Usuario implements Serializable {
         this.notas = notas;
     }
 
-
     @JsonIgnore
     @OneToMany(mappedBy = "usuarioid", cascade = CascadeType.ALL)
     public Set<Log> getLog() {
@@ -133,4 +137,26 @@ public class Usuario implements Serializable {
     public void setLog(Set<Log> log) {
         this.log = log;
     }
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "remitente", cascade = CascadeType.ALL, orphanRemoval = true)
+    public Set<Contacto> getContactosEnviados() {
+        return contactosEnviados;
+    }
+
+    public void setContactosEnviados(Set<Contacto> contactosEnviados) {
+        this.contactosEnviados = contactosEnviados;
+    }
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "destinatario", cascade = CascadeType.ALL, orphanRemoval = true)
+    public Set<Contacto> getContactosRecibidos() {
+        return contactosRecibidos;
+    }
+
+    public void setContactosRecibidos(Set<Contacto> contactosRecibidos) {
+        this.contactosRecibidos = contactosRecibidos;
+    }
+
+    
 }
