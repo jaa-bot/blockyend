@@ -95,4 +95,13 @@ public class ContactoController {
             return new ResponseEntity<>(new Mensaje("Usuario no encontrado"), HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping("/detailContacto/{id}")
+    public ResponseEntity<Contacto> getById(@PathVariable("id") int id) {
+        if (!contactoService.existsById(id))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Contacto contacto = contactoService.getOne(id).get();
+
+        return new ResponseEntity<>(contacto, HttpStatus.OK);
+    }
 }
