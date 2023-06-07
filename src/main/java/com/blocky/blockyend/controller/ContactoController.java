@@ -77,22 +77,19 @@ public class ContactoController {
             return new ResponseEntity<>(new Mensaje("El título es obligatorio"), HttpStatus.BAD_REQUEST);
         }
 
-        Optional<Usuario> remitente = usuarioService.getOne(notasDto.getRemitente());
-        Optional<Usuario> destinatario = usuarioService.getOne(notasDto.getDestinatario());
+        Optional<Usuario> optionalRemitente = usuarioService.getOne(notasDto.getRemitente());
+        Optional<Usuario> optionalDestinatario = usuarioService.getOne(notasDto.getDestinatario());
 
-        if (remitente.isPresent()) {
-            Usuario usuarioRemitente = remitente.get();
-            Usuario usuarioDestinatario = destinatario.get();
-            Contacto notas = new Contacto(notasDto.getTitulo(), notasDto.getDescripcion(), usuarioRemitente, usuarioDestinatario);
-            contactoService.save(notas);
+        if (optionalRemitente.isPresent() && optionalDestinatario.isPresent()) {
+            Usuario usuarioRemitente = optionalRemitente.get();
+            Usuario usuarioDestinatario = optionalDestinatario.get();
+            Contacto contacto = new Contacto(notasDto.getTitulo(), notasDto.getDescripcion(), usuarioRemitente,
+                    usuarioDestinatario);
+            contactoService.save(contacto);
 
-            /*logController.create(
-                    new LogDto(usuario.getId(), "El usuario: " + usuario.getNombreUsuario()
-                            + " ha creado una nueva nota. Titulo de la nota: " + notas.getTitulo()));*/
-
-            return new ResponseEntity<>(new Mensaje("Nota creada"), HttpStatus.OK);
+            return new ResponseEntity<>(new Mensaje("Contacto creado"), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new Mensaje("Usuario no encontrado"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Mensaje("Remitente o destinatario no encontrado"), HttpStatus.NOT_FOUND);
         }
     }
 

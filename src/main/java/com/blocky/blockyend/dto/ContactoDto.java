@@ -11,13 +11,13 @@ public class ContactoDto {
     private String descripcion;
 
     @NotBlank
-    private int remitente;
+    private Integer remitente;
 
     @NotBlank
-    private int destinatario;
+    private Integer destinatario;
 
-    public ContactoDto(@NotBlank String titulo, @NotBlank String descripcion, @NotBlank int remitente,
-            @NotBlank int destinatario) {
+    public ContactoDto(@NotBlank String titulo, @NotBlank String descripcion, @NotBlank Integer remitente,
+            @NotBlank Integer destinatario) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.remitente = remitente;
@@ -40,19 +40,19 @@ public class ContactoDto {
         this.descripcion = descripcion;
     }
 
-    public int getRemitente() {
+    public Integer getRemitente() {
         return remitente;
     }
 
-    public void setRemitente(int remitente) {
+    public void setRemitente(Integer remitente) {
         this.remitente = remitente;
     }
 
-    public int getDestinatario() {
+    public Integer getDestinatario() {
         return destinatario;
     }
 
-    public void setDestinatario(int destinatario) {
+    public void setDestinatario(Integer destinatario) {
         this.destinatario = destinatario;
     }
 }

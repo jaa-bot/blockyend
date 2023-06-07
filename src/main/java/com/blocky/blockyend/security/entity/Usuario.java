@@ -22,7 +22,10 @@ import javax.validation.constraints.Pattern;
 import com.blocky.blockyend.entity.Contacto;
 import com.blocky.blockyend.entity.Log;
 import com.blocky.blockyend.entity.Notas;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Table(name = "usuario")
@@ -138,7 +141,8 @@ public class Usuario implements Serializable {
         this.log = log;
     }
 
-    @JsonIgnore
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @OneToMany(mappedBy = "remitente", cascade = CascadeType.ALL, orphanRemoval = true)
     public Set<Contacto> getContactosEnviados() {
         return contactosEnviados;
@@ -148,7 +152,8 @@ public class Usuario implements Serializable {
         this.contactosEnviados = contactosEnviados;
     }
 
-    @JsonIgnore
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @OneToMany(mappedBy = "destinatario", cascade = CascadeType.ALL, orphanRemoval = true)
     public Set<Contacto> getContactosRecibidos() {
         return contactosRecibidos;
@@ -157,6 +162,4 @@ public class Usuario implements Serializable {
     public void setContactosRecibidos(Set<Contacto> contactosRecibidos) {
         this.contactosRecibidos = contactosRecibidos;
     }
-
-    
 }

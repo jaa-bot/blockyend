@@ -12,7 +12,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.blocky.blockyend.security.entity.Usuario;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "contacto")
@@ -62,7 +63,7 @@ public class Contacto implements Serializable{
         this.descripcion = descripcion;
     }
 
-    @JsonIgnore
+    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "remitente")
     public Usuario getRemitente() {
@@ -73,7 +74,7 @@ public class Contacto implements Serializable{
         this.remitente = remitente;
     }
 
-    @JsonIgnore
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "destinatario")
     public Usuario getDestinatario() {
@@ -83,5 +84,4 @@ public class Contacto implements Serializable{
     public void setDestinatario(Usuario destinatario) {
         this.destinatario = destinatario;
     }
-
 }
