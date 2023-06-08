@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.blocky.blockyend.dto.ContactoDto;
+import com.blocky.blockyend.dto.LogDto;
 import com.blocky.blockyend.dto.Mensaje;
 import com.blocky.blockyend.entity.Contacto;
 import com.blocky.blockyend.security.entity.Usuario;
@@ -84,8 +86,12 @@ public class ContactoController {
             Usuario usuarioRemitente = optionalRemitente.get();
             Usuario usuarioDestinatario = optionalDestinatario.get();
             Contacto contacto = new Contacto(notasDto.getTitulo(), notasDto.getDescripcion(), usuarioRemitente,
-                    usuarioDestinatario);
+                    usuarioDestinatario, notasDto.isResponder());
             contactoService.save(contacto);
+
+            logController.create(
+                new LogDto(contacto.getId(), "El usuario: " + usuarioRemitente.getNombreUsuario()
+                        + " ha enviado una pregunta. Titulo de la pregunta: " + contacto.getTitulo()));
 
             return new ResponseEntity<>(new Mensaje("Contacto creado"), HttpStatus.OK);
         } else {
@@ -100,5 +106,16 @@ public class ContactoController {
         Contacto contacto = contactoService.getOne(id).get();
 
         return new ResponseEntity<>(contacto, HttpStatus.OK);
+    }
+
+    @PutMapping("/updateContacto/{id}")
+    public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody ContactoDto notasDto) {
+
+        Contacto nota = contactoService.getOne(id).get();
+        
+        nota.setResponder(true);
+        contactoService.save(nota);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

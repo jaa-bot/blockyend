@@ -56,6 +56,8 @@ public class Notas implements Serializable{
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
+
+    @Column(name = "texto", length = 1000)
     public String getTexto() {
         return texto;
     }

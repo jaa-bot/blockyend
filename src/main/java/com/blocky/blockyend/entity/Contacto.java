@@ -24,12 +24,16 @@ public class Contacto implements Serializable{
     private String descripcion;
     private Usuario remitente;
     private Usuario destinatario;
+    private boolean responder;
 
-    public Contacto(String titulo, String descripcion, Usuario remitente, Usuario destinatario) {
+
+
+    public Contacto(String titulo, String descripcion, Usuario remitente, Usuario destinatario, boolean responder) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.remitente = remitente;
         this.destinatario = destinatario;
+        this.responder = responder;
     }
 
     public Contacto(){
@@ -55,6 +59,7 @@ public class Contacto implements Serializable{
         this.titulo = titulo;
     }
 
+    @Column(name = "descripcion", length = 1000)
     public String getDescripcion() {
         return descripcion;
     }
@@ -83,5 +88,13 @@ public class Contacto implements Serializable{
 
     public void setDestinatario(Usuario destinatario) {
         this.destinatario = destinatario;
+    }
+
+    public boolean isResponder() {
+        return responder;
+    }
+
+    public void setResponder(boolean responder) {
+        this.responder = responder;
     }
 }

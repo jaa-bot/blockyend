@@ -15,13 +15,17 @@ public class ContactoDto {
 
     @NotBlank
     private int destinatario;
+    
+    @NotBlank
+    private boolean responder;
 
     public ContactoDto(@NotBlank String titulo, @NotBlank String descripcion, @NotBlank int remitente,
-            @NotBlank int destinatario) {
+            @NotBlank int destinatario, @NotBlank boolean responder) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.remitente = remitente;
         this.destinatario = destinatario;
+        this.responder = responder;
     }
 
     public String getTitulo() {
@@ -55,4 +59,14 @@ public class ContactoDto {
     public void setDestinatario(int destinatario) {
         this.destinatario = destinatario;
     }
+
+    public boolean isResponder() {
+        return responder;
+    }
+
+    public void setResponder(boolean responder) {
+        this.responder = responder;
+    }
+
+    
 }

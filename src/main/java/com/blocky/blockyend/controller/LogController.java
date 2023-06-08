@@ -9,20 +9,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.blocky.blockyend.dto.LogDto;
+import com.blocky.blockyend.dto.Mensaje;
 import com.blocky.blockyend.entity.Log;
 import com.blocky.blockyend.security.entity.Usuario;
 import com.blocky.blockyend.service.LogService;
 import com.blocky.blockyend.service.UsuarioService;
 
 @RestController
-@RequestMapping("/Log")
+@RequestMapping("/log")
 @CrossOrigin(origins = "*")
 public class LogController {
 
@@ -52,6 +55,15 @@ public class LogController {
         } else {
             System.out.println("no se pudo crear el log correctamente");
         }
+    }
+
+    @DeleteMapping("/deleteLog/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") int id) {
+        if (!logService.existsById(id))
+            return new ResponseEntity<>(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
+
+        logService.delete(id);
+        return new ResponseEntity<>(new Mensaje("Log eliminado"), HttpStatus.OK);
     }
 
 }

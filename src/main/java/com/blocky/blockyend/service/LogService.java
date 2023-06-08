@@ -1,6 +1,7 @@
 package com.blocky.blockyend.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -23,6 +24,18 @@ public class LogService {
 
     public List<Log> list() {
         return logRepository.findAll();
+    }
+
+    public Optional<Log> getOne(int id) {
+        return logRepository.findById(id);
+    }
+
+    public void delete(int id) {
+        logRepository.deleteById(id);
+    }
+
+    public boolean existsById(int id) {
+        return logRepository.existsById(id);
     }
 
 }
