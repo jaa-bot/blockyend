@@ -84,6 +84,10 @@ public class AuthController
         {
             return new ResponseEntity<>(new Mensaje("Formato email mal introducido"), HttpStatus.BAD_REQUEST);
         }
+
+        if (nuevoUsuario.getNombreUsuario().length() < 6)
+            return new ResponseEntity<>(new Mensaje("El nombre de usuario debe tener minimo 6 caracteres"), HttpStatus.BAD_REQUEST);
+
         if (usuarioService.existsByNombreUsuario(nuevoUsuario.getNombreUsuario()))
             return new ResponseEntity<>(new Mensaje("El nombre de usuario ya existe"), HttpStatus.BAD_REQUEST);
         if (usuarioService.existsByEmail(nuevoUsuario.getEmail()))
