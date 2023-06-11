@@ -161,5 +161,5 @@ public class Usuario implements Serializable {
 
     public void setContactosRecibidos(Set<Contacto> contactosRecibidos) {
         this.contactosRecibidos = contactosRecibidos;
-    } 
+    }
 }

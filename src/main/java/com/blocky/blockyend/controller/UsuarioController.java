@@ -1,6 +1,8 @@
 package com.blocky.blockyend.controller;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +25,9 @@ import com.blocky.blockyend.security.dto.UsuarioDto;
 import com.blocky.blockyend.security.entity.Usuario;
 import com.blocky.blockyend.service.UsuarioService;
 
-@RestController
-@RequestMapping("/usuario")
-@CrossOrigin(origins = "*")
-public class UsuarioController {
+@RestController @RequestMapping("/usuario") @CrossOrigin(origins = "*")
+public class UsuarioController
+{
 
     @Autowired
     UsuarioService usuarioService;
@@ -38,13 +39,15 @@ public class UsuarioController {
     PasswordEncoder passwordEncoder;
 
     @GetMapping("/lista")
-    public ResponseEntity<List<Usuario>> list() {
+    public ResponseEntity<List<Usuario>> list()
+    {
         List<Usuario> list = usuarioService.list();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @GetMapping("/detail/{id}")
-    public ResponseEntity<Usuario> getById(@PathVariable("id") int id) {
+    public ResponseEntity<Usuario> getById(@PathVariable("id") int id)
+    {
         if (!usuarioService.existsById(id))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         Usuario producto = usuarioService.getOne(id).get();
@@ -52,7 +55,8 @@ public class UsuarioController {
     }
 
     @GetMapping("/detailnameUser/{nombreUsuario}")
-    public ResponseEntity<Usuario> getByNombreUser(@PathVariable("nombreUsuario") String nombreUsuario) {
+    public ResponseEntity<Usuario> getByNombreUser(@PathVariable("nombreUsuario") String nombreUsuario)
+    {
         if (!usuarioService.existsByNombreUsuario(nombreUsuario))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         Usuario producto = usuarioService.getByNombreUsuario(nombreUsuario).get();
@@ -61,7 +65,8 @@ public class UsuarioController {
     }
 
     @GetMapping("/detailname/{nombre}")
-    public ResponseEntity<Usuario> getByNombre(@PathVariable("nombre") String nombre) {
+    public ResponseEntity<Usuario> getByNombre(@PathVariable("nombre") String nombre)
+    {
         if (!usuarioService.existsByNombre(nombre))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         Usuario producto = usuarioService.getByNombre(nombre).get();
@@ -70,7 +75,31 @@ public class UsuarioController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody UsuarioDto usuarioDto) {
+    public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody UsuarioDto usuarioDto)
+    {
+
+        String expresionRegular = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
+
+        Pattern pattern = Pattern.compile(expresionRegular);
+        Matcher matcher = pattern.matcher(usuarioDto.getPassword());
+
+        if (!matcher.matches())
+        {
+            return new ResponseEntity<>(new Mensaje(
+                    "Formato contraseña mal introducido, minimo 8 caracteres, debe contener mayuscula y minuscula, minimo un digito"),
+                    HttpStatus.BAD_REQUEST);
+
+        }
+
+        String expresionRegularEmail = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
+
+        Pattern pattern2 = Pattern.compile(expresionRegularEmail);
+        Matcher matcher2 = pattern2.matcher(usuarioDto.getPassword());
+
+        if (!matcher2.matches())
+        {
+            return new ResponseEntity<>(new Mensaje("Formato email mal introducido"), HttpStatus.BAD_REQUEST);
+        }
 
         Usuario usuario = usuarioService.getOne(id).orElse(null);
 
@@ -99,9 +128,19 @@ public class UsuarioController {
         return new ResponseEntity<>(new Mensaje("Se ha actualizado el perfil"), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/updateAdmin/{id}")
-    public ResponseEntity<?> updateAdmin(@PathVariable("id") int id, @RequestBody UsuarioDto usuarioDto) {
+    @PreAuthorize("hasRole('ADMIN')") @PutMapping("/updateAdmin/{id}")
+    public ResponseEntity<?> updateAdmin(@PathVariable("id") int id, @RequestBody UsuarioDto usuarioDto)
+    {
+
+        String expresionRegularEmail = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
+
+        Pattern pattern2 = Pattern.compile(expresionRegularEmail);
+        Matcher matcher2 = pattern2.matcher(usuarioDto.getPassword());
+
+        if (!matcher2.matches())
+        {
+            return new ResponseEntity<>(new Mensaje("Formato email mal introducido"), HttpStatus.BAD_REQUEST);
+        }
 
         Usuario usuario = usuarioService.getOne(id).orElse(null);
 
@@ -127,10 +166,11 @@ public class UsuarioController {
         return new ResponseEntity<>(new Mensaje("Se ha actualizado el perfil"), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") int id) {
-        if (!usuarioService.existsById(id)) {
+    @PreAuthorize("hasRole('ADMIN')") @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") int id)
+    {
+        if (!usuarioService.existsById(id))
+        {
             return new ResponseEntity<>(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
         }
 

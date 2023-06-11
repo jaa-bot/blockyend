@@ -2,6 +2,8 @@ package com.blocky.blockyend.security.controller;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.validation.Valid;
 
@@ -34,10 +36,9 @@ import com.blocky.blockyend.security.jwt.JwtProvider;
 import com.blocky.blockyend.security.service.RolService;
 import com.blocky.blockyend.security.service.UsuarioServiceSecurity;
 
-@RestController
-@RequestMapping("/auth")
-@CrossOrigin
-public class AuthController {
+@RestController @RequestMapping("/auth") @CrossOrigin
+public class AuthController
+{
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -58,11 +59,29 @@ public class AuthController {
     LogController logController;
 
     @PostMapping("/nuevo")
-    public ResponseEntity<?> nuevo(@Valid @RequestBody UsuarioDto nuevoUsuario, BindingResult bindingResult) {
+    public ResponseEntity<?> nuevo(@Valid @RequestBody UsuarioDto nuevoUsuario)
+    {
 
-        System.out.println(bindingResult.hasFieldErrors("email"));
+        String expresionRegular = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
 
-        if (bindingResult.hasErrors()) {
+        Pattern pattern = Pattern.compile(expresionRegular);
+        Matcher matcher = pattern.matcher(nuevoUsuario.getPassword());
+
+        if (!matcher.matches())
+        {
+            return new ResponseEntity<>(new Mensaje(
+                    "Formato contraseña mal introducido, minimo 8 caracteres, debe contener mayuscula y minuscula, minimo un digito"),
+                    HttpStatus.BAD_REQUEST);
+
+        }
+
+        String expresionRegularEmail = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
+
+        Pattern pattern2 = Pattern.compile(expresionRegularEmail);
+        Matcher matcher2 = pattern2.matcher(nuevoUsuario.getPassword());
+
+        if (!matcher2.matches())
+        {
             return new ResponseEntity<>(new Mensaje("Formato email mal introducido"), HttpStatus.BAD_REQUEST);
         }
         if (usuarioService.existsByNombreUsuario(nuevoUsuario.getNombreUsuario()))
@@ -71,8 +90,7 @@ public class AuthController {
             return new ResponseEntity<>(new Mensaje("Ya hay una cuenta registrada con ese email"),
                     HttpStatus.BAD_REQUEST);
         Usuario usuario = new Usuario(nuevoUsuario.getNombre(), nuevoUsuario.getNombreUsuario(),
-                nuevoUsuario.getEmail(),
-                passwordEncoder.encode(nuevoUsuario.getPassword()));
+                nuevoUsuario.getEmail(), passwordEncoder.encode(nuevoUsuario.getPassword()));
         Set<Rol> roles = new HashSet<>();
         roles.add(rolService.getByRolNombre(RolNombre.ROLE_USER).get());
         if (nuevoUsuario.getRoles().contains("admin"))
@@ -80,13 +98,15 @@ public class AuthController {
         usuario.setRoles(roles);
         usuarioService.save(usuario);
 
-        logController.create(new LogDto(usuario.getId(), "Nuevo usuario registrado. Nombre Usuario: " + usuario.getNombreUsuario()));
+        logController.create(
+                new LogDto(usuario.getId(), "Nuevo usuario registrado. Nombre Usuario: " + usuario.getNombreUsuario()));
 
         return new ResponseEntity<>(new Mensaje("usuario guardado"), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtDto> login(@Valid @RequestBody LoginUsuario loginUsuario, BindingResult bindingResult) {
+    public ResponseEntity<JwtDto> login(@Valid @RequestBody LoginUsuario loginUsuario, BindingResult bindingResult)
+    {
         if (bindingResult.hasErrors())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Authentication authentication = authenticationManager.authenticate(
